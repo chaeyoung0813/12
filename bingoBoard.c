@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include "bingoBoard.h"
-#define BINGONUM_HOLE    5
+#define BINGONUM_HOLE    0
 
 
 static int bingoBoard[N_SIZE][N_SIZE];
@@ -16,24 +16,33 @@ int bingo_checkNum(int selNum)
 void bingo_init(void)
 {
 	int i, j, k;
-	int cnt=1;
+	int randNum; //랜덤 번호 (몇번쨰 숫자를 선택) 
+	int maxNum = N_SIZE*N_SIZE; //현재 남아있는 숫 
 	
-	for(i=0; i<N_SIZE; i++)
-		{
+	for (i=0;i<N_SIZE*N_SIZE;i++)
+		numberStatus[i] = BINGO_NUMSTATUS_ABSENT;
 		
-		for (j=0; j<N_SIZE; j++)
+		for (i=0;i<N_SIZE;i++)
+		for (j=0;j<N_SIZE;j++)
 		{
-			if (cnt==15)
+			randNum = rand()%maxNum; //랜덤 숫자 선택  
+			
+			for (k=0;k<N_SIZE*N_SIZE;k++)//각 숫자에 대해 따져보기  
 			{
-				bingoBoard[i][j]=BINGONUM_HOLE;
-				numberStatus[cnt-1]=BINGONUM_HOLE;
-				cnt++;
+				if (numberStatus[k] == BINGO_NUMSTATUS_ABSENT ) //숫자 k+1이 아직 할당이 안되어 있다면  
+				{
+					if (randNum == 0) //k+1 이 randNum번째 숫자이면  
+						break;
+					else
+						randNum--; //그렇지 않으면 하나 줄임  
+				}
 			}
-			else
-				numberStatus[cnt-1]=i*N_SIZE + j;
-				bingoBoard[i][j]=cnt++;
+			//숫자 k+1을 할당 
+			numberStatus[k] = i*N_SIZE + j;
+			bingoBoard[i][j] = k+1;
+			maxNum--;
 		}
-}}
+}
 
 void bingo_printBoard(void)
 {
@@ -128,5 +137,7 @@ int bingo_countCompletedline(void)
 	}
 		if (checkBingo==1)
 			cnt++; 
+			
+return cnt;
 }
 
